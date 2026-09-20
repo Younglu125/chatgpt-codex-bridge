@@ -1,0 +1,16 @@
+[project]
+name = "chatgpt-codex-bridge"
+version = "0.2.7"
+description = "Frozen project evidence for ordinary ChatGPT analysis and Codex implementation"
+requires-python = ">=3.12"
+dependencies = []
+
+[project.optional-dependencies]
+mcp = ["mcp==1.30.0"]
+
+[dependency-groups]
+dev = ["pytest==9.1.1"]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]

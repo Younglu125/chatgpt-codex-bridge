@@ -1,0 +1,7 @@
+#!/bin/sh
+set -eu
+BRIDGE_ROOT="$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)"
+if [ -x "$BRIDGE_ROOT/.venv/bin/python" ]; then
+  exec "$BRIDGE_ROOT/.venv/bin/python" "$BRIDGE_ROOT/bridge.py" "$@"
+fi
+exec python3 "$BRIDGE_ROOT/bridge.py" "$@"

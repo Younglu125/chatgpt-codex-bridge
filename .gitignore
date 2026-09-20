@@ -1,0 +1,13 @@
+.venv/
+__pycache__/
+.pytest_cache/
+*.egg-info/
+node_modules/
+dist/
+validation/
+release/
+.bridge/
+.DS_Store
+.env
+.env.*
+!.env.example

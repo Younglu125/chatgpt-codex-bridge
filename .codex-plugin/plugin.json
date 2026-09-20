@@ -1,0 +1,18 @@
+{
+  "name": "chatgpt-codex-bridge",
+  "version": "0.2.7",
+  "description": "普通 ChatGPT 分析、只读项目证据 MCP 与 Codex 实施交接",
+  "author": {
+    "name": "ChatGPT Codex Bridge contributors"
+  },
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "ChatGPT Codex Bridge",
+    "shortDescription": "普通 ChatGPT 分析，Codex 实施和验证。",
+    "longDescription": "Ordinary ChatGPT planning and review, native or browser messaging, optional pinned read-only workspace MCP, and local Codex implementation.",
+    "developerName": "ChatGPT Codex Bridge contributors",
+    "category": "Productivity",
+    "capabilities": [],
+    "defaultPrompt": "使用 chatgpt-codex-bridge 将当前项目的分析交给普通 ChatGPT，再由 Codex 实施验证。"
+  }
+}

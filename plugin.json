@@ -1,0 +1,10 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "chatgpt-codex-bridge",
+  "version": "0.2.7",
+  "description": "Ordinary ChatGPT analysis and review with local Codex execution; Lite and optional workspace MCP.",
+  "license": "MIT",
+  "author": {
+    "name": "ChatGPT Codex Bridge contributors"
+  }
+}
