@@ -1,6 +1,6 @@
 {
   "name": "chatgpt-codex-bridge",
-  "version": "0.2.8",
+  "version": "0.2.9",
   "description": "普通 ChatGPT 分析、只读项目证据 MCP 与 Codex 实施交接",
   "author": {
     "name": "ChatGPT Codex Bridge contributors"

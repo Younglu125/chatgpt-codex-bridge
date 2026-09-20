@@ -1,4 +1,10 @@
-# Validation — 0.2.8 integration candidate
+# Validation — 0.2.9 integration candidate
+
+0.2.9: 61 Python tests and 172 pinned-backend tests (17 files) passed on macOS ARM64.
+The release ZIP privacy gate passed; two rendered local routing screenshots were visually reviewed.
+This release adds privacy-scanner regression tests and local routing demonstration screenshots.
+These screenshots do not send GPT messages or establish new Full connector acceptance.
+See SHARING_REVIEW.md for the separate Git-history privacy limitation.
 
 2026-09-20 update: 56 Python tests passed, including CLI subprocess tests for
 conversation persistence, isolation, temporary local override, mandatory one-off GPT assistance,

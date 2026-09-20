@@ -209,7 +209,7 @@ class Store:
         if not re.fullmatch(r"[a-z0-9-]{1,64}", name):
             raise ValueError("invalid project id")
         root = Path(root).expanduser().resolve(strict=True)
-        if not root.is_dir() or root in {Path("/"), Path.home(), Path.home() / "AI_Projects"}:
+        if not root.is_dir() or root in {Path("/"), Path.home()}:
             raise ValueError("select a single project directory")
         config = self.config()
         previous = config["projects"].get(name, {})

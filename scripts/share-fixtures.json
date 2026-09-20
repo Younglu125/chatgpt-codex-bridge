@@ -1,0 +1,42 @@
+{
+  "tests/test_bridge.py": {
+    "sha256": "5b240654f9d7072c311c6d1f2ecee37a86550bab9bc4f07fb5b1f1a6ae7c6522",
+    "reason": "Reviewed synthetic test fixture or secret-detection pattern; not live personal data."
+  },
+  "vendor/codex-with-chatgpt/src/execution/sanitize.ts": {
+    "sha256": "9fb9d389f87ebbe5af0096118bf85eda67fca9cf267cc7ab247faa7bed66c15f",
+    "reason": "Reviewed synthetic test fixture or secret-detection pattern; not live personal data."
+  },
+  "vendor/codex-with-chatgpt/tests/endpoint.test.ts": {
+    "sha256": "dc8161c334470912cb5e36cf3fba670b8cde9080ac7559a787167bf9ea059210",
+    "reason": "Reviewed synthetic test fixture or secret-detection pattern; not live personal data."
+  },
+  "vendor/codex-with-chatgpt/tests/execution-output.test.ts": {
+    "sha256": "283810dc841af67a83bcd44d599df9f326911c171b8fa3bd66da88632482633a",
+    "reason": "Reviewed synthetic test fixture or secret-detection pattern; not live personal data."
+  },
+  "vendor/codex-with-chatgpt/tests/git.test.ts": {
+    "sha256": "95ec355d0ccaaa303abd9e522478c23bd358582653d5a5947f37c23980c3131b",
+    "reason": "Reviewed synthetic test fixture or secret-detection pattern; not live personal data."
+  },
+  "vendor/codex-with-chatgpt/tests/mcp-integration.test.ts": {
+    "sha256": "d512fd16407ccbc4524a87145a002dc91c3d6952d6cdb83176fd3270a0a7d27c",
+    "reason": "Reviewed synthetic test fixture or secret-detection pattern; not live personal data."
+  },
+  "vendor/codex-with-chatgpt/tests/sandbox-allow.test.ts": {
+    "sha256": "76cc167ebf984f012931b8ea80d6ce44f87c866bfe7f94a96d11d5d51a376876",
+    "reason": "Reviewed synthetic test fixture or secret-detection pattern; not live personal data."
+  },
+  "vendor/codex-with-chatgpt/tests/session.test.ts": {
+    "sha256": "0fe55f92ec79a5bca561d85f5e7a8ef4fdb0472e397922e9f236457bd1cf5a73",
+    "reason": "Reviewed synthetic test fixture or secret-detection pattern; not live personal data."
+  },
+  "vendor/codex-with-chatgpt/tests/tunnel.test.ts": {
+    "sha256": "5f76a83913535469ed2ad2c27d153867228e040b9dece73a64beaf03e7d8518e",
+    "reason": "Reviewed synthetic test fixture or secret-detection pattern; not live personal data."
+  },
+  "vendor/codex-with-chatgpt/tests/helpers.ts": {
+    "sha256": "f559a10c294c7bed0be83a790868c448ca6874e857091f4ce05f3e8018697d7b",
+    "reason": "Reviewed synthetic test fixture or secret-detection pattern; not live personal data."
+  }
+}

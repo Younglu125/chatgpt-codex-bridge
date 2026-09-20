@@ -1,123 +1,141 @@
-# ChatGPT Codex Bridge
+# ChatGPT Codex Bridge · CCB
 
-Ordinary ChatGPT analyzes and reviews; Codex implements and tests in your current local project.
-New conversations use Codex directly. An intentional `CCB`, `ccb`, `$CCB`, or `$ccb` request enables
-conversation-scoped collaboration until disabled. Follow-ups inherit it without another marker.
-Codex selectively consults ChatGPT for substantial analysis, major decisions and independent review;
-routine edits, tests and small fixes stay local. Explicit GPT requests override that cost/latency choice.
-Phase words are optional. Mentions, quotations and negation do not activate collaboration.
-`scripts/session.py` persists the preference by Codex conversation ID; the skill interprets intent
-and invokes it (there is no automatic host hook). New conversations remain independent.
-Version 0.2.8 combines native conversation messaging and frozen evidence with the unmodified,
-pinned live workspace MCP implementation from [codex-with-chatgpt](https://github.com/XiaoDuoYa/codex-with-chatgpt).
-No OpenAI API calls or API keys are required by these routes. The plugin does not increase
-subscription limits; actual quota savings have not been measured.
+**Keep coding with Codex. Bring ordinary ChatGPT in when another perspective is worth the handoff.**
 
-中文安装与使用：[USAGE.zh-CN.md](USAGE.zh-CN.md)
+English | [简体中文](README.zh-CN.md)
 
-## Automatic route: reuse first
+[![MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Python](https://img.shields.io/badge/python-3.12%2B-blue.svg)](pyproject.toml)
+[![Preview](https://img.shields.io/badge/status-preview-orange.svg)](VALIDATION.md)
 
-The user does not choose a transport for every task. The bridge identifies the current checkout and
-checks that project's saved state. If its authorized Full connection is running, it is reused. A
-repository-wide question uses Full because ChatGPT must discover and traverse files. A small question
-with already-known files automatically falls back to a frozen snapshot when Full is unavailable. A
-question needing no local files sends only the prompt.
+CCB is an independent Codex plugin. Ordinary ChatGPT helps with substantial planning, major
+decisions and independent review. Codex owns local edits and tests.
+No ChatGPT Work, private account APIs or OpenAI API key required.
 
-`scripts/route.py --project PROJECT --scope prompt|bounded|repository` makes this decision. It does
-not mistake a local process, tunnel or issued token for a working ChatGPT connection: live reuse
-requires a saved ChatGPT chat that passed workspace identity and file-read verification.
+## A small switch, a natural workflow
 
-## Modes and evidence
+| Your request | What happens |
+|---|---|
+| Fix this small bug | Codex directly |
+| CCB, help plan this refactor | Enable collaboration; consult ChatGPT |
+| Implement the agreed approach | Codex edits and tests |
+| Reconsider the architecture | Consider another ChatGPT analysis |
+| Handle this step yourself | Codex this time; collaboration stays on |
+| Ask GPT for help on this step | Explicit one-off consultation |
+| Exit CCB | Return to Codex-only |
 
-| Mode | Local evidence | Necessary conditions | What is optional |
-|---|---|---|---|
-| Lite / prompt | None | Python 3.12+, macOS/Linux/WSL2, Codex with local execution, ordinary ChatGPT chat, native tools OR browser access | Node, MCP, tunnel, API key, developer mode are unnecessary |
-| Lite / snapshot | Explicit filtered frozen files in a message | Same as Lite; permission to send those project contents | Same optional dependencies |
-| Frozen MCP | Approved immutable job snapshot, six read-only tools | Python MCP extra, remote HTTPS/OAuth connection available to ChatGPT | Live workspace backend unnecessary |
-| Full / live | Current files, search, Git diff, actual execution records; nine read-only tools | Lite requirements + Node >=20/npm + custom MCP available in ChatGPT + configured OAuth HTTPS connection | cloudflared is needed for bundled tunnels; fixed domain optional |
+Intentional requests using `CCB`, `ccb`, `$CCB` or `$ccb` enable the current conversation.
+Follow-ups inherit the preference; new conversations default to Codex.
+Phase words are optional. Quotes, code, negation and plugin maintenance do not activate collaboration.
 
-Full's messages may use native tools OR the browser. MCP provides data, not message delivery.
-Native kind=chatgpt alone does not prove ordinary Chat, selected model or billing attribution.
-No route silently switches to ChatGPT Work or a paid model API.
+This is **skill-driven**, not a global message interceptor. Codex interprets intent and calls the
+session helper. The shorthand does not register a separate skill named CCB; if your client
+cannot resolve it, invoke `$chatgpt-codex-bridge`.
 
-## Install from a release
+## Why CCB?
 
-1. Extract the release into a permanent directory (any path, including spaces).
-2. `python3 scripts/setup.py --mode lite` checks local prerequisites, with no network dependency install.
-3. Register the package with your Codex plugin system. For local personal installation, run
-   `python3 scripts/install_plugin.py` for Lite or `python3 scripts/install_plugin.py --mode full`
-   when Full is wanted on this machine. Later runs of the default `auto` mode preserve a previously
-   built Full installation. It copies a self-contained generated package and registers
-   the default personal marketplace through Codex's official plugin-creator helper, when that helper
-   is installed. If unavailable, follow the official plugin installation documentation linked below.
-4. Start a new Codex task to load the installed version. Ask Codex to bind an existing ordinary
-   ChatGPT chat once. Use a dedicated chat per project if history separation matters. A global
-   legacy target remains usable; no author's account or target is shipped.
-5. In your actual project ask:
+- Selective handoffs: routine edits, status checks, tests and small fixes stay with Codex.
+- Lite snapshots or live, read-only workspace access.
+- Per-project jobs and saved replies for recovery without duplicate sends.
+- Separate conversation preference, workspace identity and ChatGPT target.
+- Full readiness requires ChatGPT to read the correct workspace and a real file.
+- Distributable packages exclude personal runtime state.
 
-> CCB 在本项目下处理【问题】。
+**Net token savings, billing attribution and speed improvements have not been measured.**
+Handoffs add latency. Use ChatGPT where its expected contribution outweighs that cost.
 
-The current checkout/worktree determines the project; you need not repeat its path.
-If the task is in an ambiguous umbrella directory, identify which project once.
+## Lite and Full
 
-For Full use `python3 scripts/setup.py --mode full`, register the current checkout, then follow the
-vendored upstream setup unchanged: run `scripts/full.py --project PROJECT -- sandbox-allow --json`
-and `scripts/full.py --project PROJECT -- setup --json`. Upstream setup creates its read-only MCP,
-OAuth pairing and default Cloudflare Quick Tunnel; no domain, Cloudflare account or OpenAI API key is
-needed. `sandbox-allow` performs the same Codex settings change documented by upstream. ChatGPT
-login/2FA, connector creation and consent remain account-owner actions. A fixed domain stays optional.
-After that one-time authorization, the project connection is reused; ordinary tasks must not repeat setup.
+| Route | Evidence available to ChatGPT | Requirements |
+|---|---|---|
+| Lite / prompt | Question only | Python 3.12+, Codex, ordinary ChatGPT, working native or browser messaging |
+| Lite / snapshot | Selected filtered frozen files | Lite plus permission to share those files |
+| Full / live | File reads, search, Git diffs, recorded execution output | Lite plus Node.js 20+/npm, cloudflared, custom MCP/OAuth access |
 
-## Lifecycle and recovery
+Optional frozen-snapshot MCP requires the Python MCP extra and separate HTTPS/OAuth setup.
+Full uses the pinned [codex-with-chatgpt](https://github.com/XiaoDuoYa/codex-with-chatgpt) backend.
+CCB adds packaging, job/evidence handoff and selective conversation coordination.
+Upstream source and licenses are preserved; see [attribution](THIRD_PARTY_NOTICES.md).
 
-- `python3 scripts/doctor.py`: read-only local readiness; native/browser/remote MCP remain unknown until exercised.
-- `python3 bridge.py auto-project --root .`: reuse/register this checkout, including worktrees.
-- `python3 scripts/route.py --project PROJECT --scope repository`: choose live reuse or the necessary fallback.
-- `python3 bridge.py target CHAT_ID --project PROJECT --model 'visible model' --proof 'ordinary Chat verified in UI'`; omit `--model` when native tools do not expose it. The stored value remains null rather than guessed.
-- `python3 bridge.py pending --project PROJECT`: project-scoped checkpoints. A timeout does not resend a request.
-- `python3 bridge.py check JOB`: frozen evidence drift; live mode requires actual Git/file recheck.
-- `python3 bridge.py complete JOB --input REPORT.md`: close an analysis-only job without claiming implementation.
-- `python3 scripts/full.py --project PROJECT -- status --json`: Full backend and authorization status.
-- `python3 scripts/full.py --project PROJECT -- unpair`, then `stop`: revoke and stop Full.
-- `python3 bridge.py revoke JOB`: revoke only a frozen snapshot's MCP access.
+Native tools or the browser deliver messages; MCP exposes files. Native chat success alone does not
+prove Full access. Healthy project connections are reused.
 
-Upgrade by reviewing a versioned release, running its tests, reinstalling the package and opening
-an updated task. Dependencies/upstream do not update silently. The installer builds Full dependencies
-before registering the new plugin when Full is selected or was already installed. Existing external
-project state and authorization are reused. Reinstall the previous release to roll back;
-0.2 preserves the v1 state schema and old jobs. Before upgrades, back up that state locally.
-Uninstall via Codex's plugin manager after stopping/revoking Full projects. Uninstalling the plugin
-does not delete history or revoke a still-running remote connection; keep or manually archive state.
+## Install
 
-## Data and boundaries
+**0.2.9 preview.** macOS has been exercised. Linux/WSL2 remains a compatibility target.
+Native Windows is not supported by CCB's POSIX snapshot/locking layer.
 
-Personal targets, project paths, transcripts and credentials are stored outside the release under
-`~/.local/share/chatgpt-codex-bridge`; override with BRIDGE_STATE_DIR. Full state is isolated beneath
-that directory in `full/`. Never publish this directory. Snapshot filtering excludes hidden files,
-credentials, databases and common generated folders, rejects symlink traversal, and redacts common
-secret patterns. Review export scope; filtering cannot guarantee removal of every possible secret.
-Full exposes a read-only workspace and uses its upstream ignore/OAuth policies; see the vendored
-security documentation. All tracked upstream files remain byte-identical to the pinned GitHub commit;
-the outer adapter only supplies the registered workspace and isolated state directory. Both routes
-send selected project content to the user's ChatGPT account.
+Clone this repository (access required), or extract a release into a permanent directory.
+Check existing changes before updating, use `git pull --ff-only`, and resolve divergence normally.
 
-Snapshot MCP remains available via `python3 scripts/setup.py --mode snapshot-mcp` and `.venv/bin/python server.py`.
-For remote snapshot MCP the legacy `scripts/public-mcp` manages an OAuth Quick Tunnel; its URL is temporary.
-It is deliberately not auto-started for Lite. Official Secure MCP Tunnel is an advanced optional alternative,
-not part of required installation. Full uses its separate live backend and pairing flow.
+```bash
+python3 --version                         # 3.12+
+python3 scripts/install_plugin.py         # First install: Lite; updates preserve Full
+python3 scripts/install_plugin.py --mode full  # If you want Full
+```
 
-## Sharing and release
+The convenience installer requires Codex CLI on PATH and the official plugin-creator helpers.
+Otherwise use the release ZIP's marketplace:
+`codex plugin marketplace add <extracted-directory>`, then install CCB from that marketplace.
+See [official packaging guidance](https://developers.openai.com/plugins/build/plugins).
 
-`python3 scripts/package_plugin.py --output /path/to/chatgpt-codex-bridge` builds from an explicit
-allowlist; no local state, validation transcripts, venv, node_modules or private target IDs are included.
-`python3 scripts/release.py --output /path/to/release-directory` produces a versioned ZIP, SHA256 and
-Git-backed marketplace layout. See [RELEASE.md](RELEASE.md) for clean-install acceptance.
-Do not promise universal platform support or fixed token savings merely because local tests pass.
-The delivered VALIDATION.md states observed and unverified coverage.
+**Open a new Codex task after installation/update.** In your actual project ask:
 
-License: MIT; upstream attribution and preserved license: [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
-The upstream skill is kept as the Full-mode runbook but is not separately activated, avoiding two
-competing skill triggers. This outer skill only selects a mode and coordinates ChatGPT with Codex.
-This is an independent community project.
+> CCB, analyze this project and recommend the next step.
 
-Official packaging and marketplace guidance: https://developers.openai.com/plugins/build/plugins
+For Full, the skill identifies the checkout, sets up its project-bound backend, and guides connector
+creation/OAuth. You handle login, CAPTCHA/2FA and necessary consent.
+Each project/Mac needs correct local setup and real workspace/file-read verification.
+Temporary tunnel addresses may change after restart; a fixed domain is optional.
+Never copy credentials or runtime state from another machine.
+
+## Recovery
+
+```bash
+python3 scripts/doctor.py
+python3 bridge.py auto-project --root .
+python3 bridge.py pending --project PROJECT
+python3 scripts/route.py --project PROJECT --scope repository
+python3 scripts/session.py --thread CODEX_CONVERSATION_ID
+python3 scripts/full.py --project PROJECT -- status --json
+```
+
+Full is read-only. Codex still needs authorization for implementation.
+Analysis-only requests stop at analysis. Review substantial milestones, not every edit/test cycle.
+An explicit GPT request overrides the normal cost/latency choice.
+
+## Privacy
+
+State lives outside the plugin at `~/.local/share/chatgpt-codex-bridge` or `BRIDGE_STATE_DIR`.
+Never share that directory, transcripts, credentials, pairing codes or personal chat URLs.
+
+Lite sends selected contents to ChatGPT. Full sends contents actually requested through MCP.
+**Read-only does not mean data stays on your Mac.** Filtering is not a secrecy guarantee.
+Review scope before allowing a handoff.
+
+```bash
+python3 scripts/audit_share.py . --tracked --history
+python3 scripts/release.py --output release
+```
+
+The heuristic scanner reports common private patterns without printing their values.
+Inspect images visually and Git metadata separately. A clean ZIP does not sanitize Git history.
+See [sharing review](SHARING_REVIEW.md), [release checklist](RELEASE.md) and [validation](VALIDATION.md).
+
+## Screenshots and contributing
+
+[Demonstration screenshots and X drafts](marketing/README.md) use actual local helper output.
+They are CLI demonstrations, not fabricated ChatGPT conversations or fresh Full proofs.
+
+```bash
+python3 -m venv .venv
+.venv/bin/python -m pip install pytest==9.1.1 mcp==1.30.0
+.venv/bin/python -m pytest -q
+```
+
+Test before committing. Keep the upstream pinned; upgrades are explicit.
+On another Mac, preserve changes, pull fast-forward, reinstall and open a new task.
+
+[Chinese operation guide](USAGE.zh-CN.md) · [Workflow](WORKFLOW.md)
+
+MIT © contributors. Independent community project; not an official OpenAI product.

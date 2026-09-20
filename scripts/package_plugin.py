@@ -9,8 +9,9 @@ import tempfile
 import uuid
 
 ROOT=Path(__file__).resolve().parents[1]
-FILES=['plugin.json','.codex-plugin/plugin.json','.mcp.json','bridge.py','server.py','oauth_provider.py','pyproject.toml','README.md','WORKFLOW.md','RELEASE.md','VALIDATION.md','LICENSE','THIRD_PARTY_NOTICES.md','UPSTREAM.json','USAGE.zh-CN.md']
-DIRS=['.github','skills','scripts','tests','examples','vendor']
+FILES=['plugin.json','.codex-plugin/plugin.json','.mcp.json','bridge.py','server.py','oauth_provider.py','pyproject.toml','README.md','README.zh-CN.md','WORKFLOW.md','RELEASE.md','VALIDATION.md','LICENSE','THIRD_PARTY_NOTICES.md','UPSTREAM.json','USAGE.zh-CN.md']
+FILES += ['SHARING_REVIEW.md']
+DIRS=['.github','skills','scripts','tests','examples','vendor','marketing']
 EXCLUDED={'.git','.venv','.tooling','node_modules','__pycache__','.pytest_cache','dist','validation','release'}
 
 def build(output):

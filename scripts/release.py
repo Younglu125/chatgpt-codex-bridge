@@ -7,6 +7,7 @@ import re
 import shutil
 import tempfile
 from package_plugin import ROOT, build
+from audit_share import scan
 
 p=argparse.ArgumentParser(description=__doc__);p.add_argument('--output',type=Path,required=True);a=p.parse_args()
 a.output.mkdir(parents=True,exist_ok=True)
@@ -14,6 +15,9 @@ version=json.loads((ROOT/'plugin.json').read_text())['version']
 with tempfile.TemporaryDirectory(prefix='bridge-release-') as temp:
     stage=Path(temp)/'chatgpt-codex-bridge'
     plugin=stage/'plugins/chatgpt-codex-bridge';build(plugin)
+    audit=scan(plugin)
+    if audit['findings']:
+        raise SystemExit(json.dumps({'privacy_scan_failed':audit['findings']}))
     # Block personal paths/IDs, not ordinary names of upstream authors or URL links.
     forbidden=[re.escape((str(Path.home())+'/').encode())]
     for file in plugin.rglob('*'):
