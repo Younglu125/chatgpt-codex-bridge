@@ -15,9 +15,12 @@
 ## Remaining release boundaries
 
 The repository is private. Anonymous readers cannot clone it merely because the README is shareable.
-An earlier commit contains a non-public author email in Git metadata. A new commit or clean ZIP does
-not erase that history. Do not change repository visibility until the owner approves history cleanup
-or a separate sanitized publication repository. No force push or visibility change was performed.
+On 2026-09-20, the owner authorized rewriting an earlier commit's private author/committer identity
+to the maintainer's GitHub noreply identity. The rewritten history preserves every commit's file tree.
+Both main and the v0.2.9 tag are updated with explicit old-ref leases. Repository visibility is unchanged.
+Existing clones must migrate safely rather than merging the old history back. Old objects may remain
+in local reflogs, other clones or hosting caches; ref rewriting does not guarantee physical erasure.
+See [other-Mac migration](OTHER_MAC_UPDATE.zh-CN.md). Do not publish old bundles or backups.
 
 The release ZIP excludes .git and personal runtime state, so it can be reviewed/shared independently.
 The scanner is heuristic, not a complete secret detector. It checks current tracked content or a
