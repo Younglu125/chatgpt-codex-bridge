@@ -1,4 +1,4 @@
 interface:
   display_name: "ChatGPT 分析交接"
-  short_description: "将项目分析交给普通 ChatGPT 会话，保存真实回复，再由 Codex 实施验证"
-  default_prompt: "使用 $chatgpt-codex-bridge。在本项目下，请让普通 ChatGPT 分析问题，按场景选择纯提示词、原生快照或 MCP，收回方案后由你在当前项目实施并测试。"
+  short_description: "CCB 开启会话协作，重大分析与复核按需交给 ChatGPT，日常执行留给 Codex"
+  default_prompt: "CCB 在本项目下处理这个问题；根据目标和会话进度动态判断分析、实施、测试或复核，明确指令优先。"

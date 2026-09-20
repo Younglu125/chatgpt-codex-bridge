@@ -1,7 +1,14 @@
 # ChatGPT Codex Bridge
 
 Ordinary ChatGPT analyzes and reviews; Codex implements and tests in your current local project.
-Version 0.2.7 combines native conversation messaging and frozen evidence with the unmodified,
+New conversations use Codex directly. An intentional `CCB`, `ccb`, `$CCB`, or `$ccb` request enables
+conversation-scoped collaboration until disabled. Follow-ups inherit it without another marker.
+Codex selectively consults ChatGPT for substantial analysis, major decisions and independent review;
+routine edits, tests and small fixes stay local. Explicit GPT requests override that cost/latency choice.
+Phase words are optional. Mentions, quotations and negation do not activate collaboration.
+`scripts/session.py` persists the preference by Codex conversation ID; the skill interprets intent
+and invokes it (there is no automatic host hook). New conversations remain independent.
+Version 0.2.8 combines native conversation messaging and frozen evidence with the unmodified,
 pinned live workspace MCP implementation from [codex-with-chatgpt](https://github.com/XiaoDuoYa/codex-with-chatgpt).
 No OpenAI API calls or API keys are required by these routes. The plugin does not increase
 subscription limits; actual quota savings have not been measured.
@@ -48,7 +55,7 @@ No route silently switches to ChatGPT Work or a paid model API.
    legacy target remains usable; no author's account or target is shipped.
 5. In your actual project ask:
 
-> 使用 $chatgpt-codex-bridge。在本项目下，请让普通 ChatGPT 分析【问题】，收回方案后由你实施并测试。
+> CCB 在本项目下处理【问题】。
 
 The current checkout/worktree determines the project; you need not repeat its path.
 If the task is in an ambiguous umbrella directory, identify which project once.

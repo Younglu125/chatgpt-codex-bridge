@@ -1,6 +1,6 @@
 [project]
 name = "chatgpt-codex-bridge"
-version = "0.2.7"
+version = "0.2.8"
 description = "Frozen project evidence for ordinary ChatGPT analysis and Codex implementation"
 requires-python = ">=3.12"
 dependencies = []

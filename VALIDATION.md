@@ -1,4 +1,15 @@
-# Validation — 0.2.7 integration candidate
+# Validation — 0.2.8 integration candidate
+
+2026-09-20 update: 56 Python tests passed, including CLI subprocess tests for
+conversation persistence, isolation, temporary local override, mandatory one-off GPT assistance,
+explicit exit and path-safe state storage. Pinned upstream: 172 tests in 17 files passed;
+Full installation and TypeScript build passed. The upstream source remains unchanged.
+Session routing is deterministic once Codex supplies intent/phase. Natural-language interpretation
+and skill activation remain agent responsibilities; these tests do not claim automatic host hooks,
+universal trigger recognition, quota savings or a new remote MCP acceptance run.
+
+The following is historical 0.2.7 acceptance evidence; its test counts and runtime versions
+describe that earlier run, not the 0.2.8 run above.
 
 Observed on 2026-09-19, macOS ARM64. This is a locally tested release candidate,
 not a claim of universal or remote-connector stability.

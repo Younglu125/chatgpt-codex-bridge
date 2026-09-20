@@ -1,6 +1,7 @@
 # Release acceptance
 
-0.2.7 is a portable integration release candidate until a second machine validates installation.
+0.2.8 adds conversation-scoped, selective ChatGPT participation. It remains a portable integration
+release candidate until a second machine validates installation.
 The target ChatGPT connector path has been exercised. Do not turn this label into a verified-stable
 claim by editing docs.
 

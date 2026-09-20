@@ -1,11 +1,48 @@
 ---
 name: chatgpt-codex-bridge
-description: Delegate analysis and review to ordinary ChatGPT, then implement and test in the current local project with Codex. Supports native or browser messaging, Lite snapshots and optional live read-only workspace MCP. Use for this bridge or ChatGPT analysis offload requests.
+description: Use when the user requests CCB, ccb, $CCB, $ccb, or $chatgpt-codex-bridge collaboration, explicitly requires ChatGPT help, or continues a conversation with CCB enabled. Persist the conversation preference and selectively consult ordinary ChatGPT for substantial analysis, decisions and independent review. Routine coding and tests remain with Codex. Mere mentions, quotes and negation do not enable CCB.
 ---
 
 # ChatGPT analysis and review → Codex implementation
 
 Resolve the plugin root as two directories above this SKILL.md. Call `python3 <plugin-root>/bridge.py` (abbreviated `bridge`) without changing the task working directory. Python 3.12+ on macOS or Linux/WSL2 is required. No OpenAI API fallback, private IPC, credential extraction or automatic Work creation.
+
+## Explicit participation gate and dynamic phases
+
+New conversations default to local Codex. An intentional request using `CCB`, `ccb`, `$CCB`,
+`$ccb`, or `$chatgpt-codex-bridge` enables collaboration for this conversation until explicitly
+disabled. Follow-ups need no repeated marker, including after a final answer. Quotes, code,
+negative instructions and discussion/maintenance of CCB itself do not enable collaboration.
+Interpret meaning, not raw substring matches. An explicit one-off request for GPT help must be
+honored without implicitly enabling every future turn.
+
+On activation and subsequent work, resolve the actual current **Codex conversation ID** from
+trusted task context (CODEX_THREAD_ID when provided) and run:
+`python3 <plugin-root>/scripts/session.py --thread ID --intent INTENT --phase PHASE`.
+Never use the destination ChatGPT chat ID, a project ID, or a guessed ID. If no current ID is
+available, use explicit conversation history and report that durable recovery is unavailable.
+The CLI does not dispatch messages or parse prompts; Codex supplies contextually interpreted intent.
+
+- `enable` / `disable`: persist the user's switch for this conversation only.
+- `inherit`: recover the preference on follow-ups and after context compaction.
+- `local-once`: honor "handle this step yourself" without disabling collaboration.
+- `require-gpt`: consult GPT this time regardless of phase; do not silently fall back if unavailable.
+- `routine` (default phase): status, file edits, tests, execution and straightforward small fixes.
+- `analysis`, `decision`, `review`: substantial planning, major architectural/tradeoff decisions,
+  or worthwhile independent review. These consult GPT when collaboration is enabled.
+
+The marker selects participation, not a mandatory phase. Infer the next phase from the user's goal
+and progress; phase words are optional. Begin substantive collaborative work with analysis, but do
+not outsource every trivial request. Prefer GPT when expected new insight outweighs latency and
+handoff cost. Reuse completed analysis; batch related questions and review meaningful milestones,
+not every edit/test cycle. Announce activation/exit and actual handoffs briefly. Save the active
+mode, current Codex ID, pending job and next step in continuation summaries. This is a skill-driven
+workflow, not an automatic host hook; persistence alone cannot force a host to load the skill.
+
+Codex retains responsibility for implementation and tests. Only implement when the user's goal
+authorizes it; analysis-only requests stop after analysis. Explicit instructions override inference.
+The project/root and account checks below still apply on every handoff; session activation never
+grants access to other projects. Only run the transport workflow below when GPT participation is chosen.
 
 ## Route by scope and reuse first
 
@@ -47,7 +84,7 @@ Message transport is independent: prefer actually callable native list_threads/r
 - Read saved `analysis.md`; check relevant citations and task scope. `bridge check JOB` detects drift in frozen evidence. For live/prompt it cannot prove file stability; inspect real git status/diff and relevant files before editing. Respect unrelated work.
 - If the authorized goal is analysis/review only and explicitly excludes local modification, save a short factual completion report and run `bridge complete JOB --input REPORT.md`. This terminal state means the analysis was delivered; it does not claim code was implemented.
 - Codex implements and runs meaningful tests. Save actual commands, results and limitations in a local report; `bridge finish JOB --input REPORT.md` marks local implementation and revokes frozen MCP access. This state does not claim independent review passed.
-- When Full is used, record actual test output and request independent review following the Full reference. For Lite, a fresh snapshot can include explicitly selected sanitized test evidence. Create the next request with `prepare PROJECT ... --parent JOB`; each child is a new immutable job linked to the implemented parent, with at most three review rounds. A failed test is repaired before claiming success. At the round limit report remaining issues; do not loop indefinitely.
+- For significant changes or explicit review requests, record actual test output and request independent review following the Full reference. Routine fixes need not trigger another GPT round. For Lite, a fresh snapshot can include explicitly selected sanitized test evidence. Create the next request with `prepare PROJECT ... --parent JOB`; each child is a new immutable job linked to the implemented parent, with at most three review rounds. A failed test is repaired before claiming success. At the round limit report remaining issues; do not loop indefinitely.
 - For long waits keep the job pending, avoid duplicate sends, and preserve files for the next task. No background polling is implied. Final delivery distinguishes local implementation, independent review, actual ChatGPT/MCP verification, and unverified platform coverage. Never promise a fixed quota saving percentage.
 
 ## Installation and sharing
