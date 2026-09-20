@@ -79,6 +79,9 @@ python3 scripts/install_plugin.py
 codex plugin list
 ```
 
+需要 Full 的 Mac 首次安装时把第二条改为 `python3 scripts/install_plugin.py --mode full`；
+以后默认的 `auto` 会保留已有 Full 构建。切换到 Lite 必须明确加 `--mode lite`。
+
 以后在任一 Mac 修改功能：先在该机运行相关测试，提交并推送 Git；另一台 Mac 在自己的克隆
 目录先确认没有未提交改动，再执行 `git pull --ff-only` 和 `python3 scripts/install_plugin.py`。
 安装后新开 Codex 任务，旧任务可能仍持有旧版 Skill 上下文。两台 Mac 同时修改时，先分别提交，

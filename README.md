@@ -38,7 +38,9 @@ No route silently switches to ChatGPT Work or a paid model API.
 1. Extract the release into a permanent directory (any path, including spaces).
 2. `python3 scripts/setup.py --mode lite` checks local prerequisites, with no network dependency install.
 3. Register the package with your Codex plugin system. For local personal installation, run
-   `python3 scripts/install_plugin.py`. It copies a self-contained generated package and registers
+   `python3 scripts/install_plugin.py` for Lite or `python3 scripts/install_plugin.py --mode full`
+   when Full is wanted on this machine. Later runs of the default `auto` mode preserve a previously
+   built Full installation. It copies a self-contained generated package and registers
    the default personal marketplace through Codex's official plugin-creator helper, when that helper
    is installed. If unavailable, follow the official plugin installation documentation linked below.
 4. Start a new Codex task to load the installed version. Ask Codex to bind an existing ordinary
@@ -73,8 +75,9 @@ After that one-time authorization, the project connection is reused; ordinary ta
 - `python3 bridge.py revoke JOB`: revoke only a frozen snapshot's MCP access.
 
 Upgrade by reviewing a versioned release, running its tests, reinstalling the package and opening
-an updated task. Dependencies/upstream do not update silently. Install Full dependencies in the new
-package; the existing external project state and authorization are reused. Reinstall the previous release to roll back;
+an updated task. Dependencies/upstream do not update silently. The installer builds Full dependencies
+before registering the new plugin when Full is selected or was already installed. Existing external
+project state and authorization are reused. Reinstall the previous release to roll back;
 0.2 preserves the v1 state schema and old jobs. Before upgrades, back up that state locally.
 Uninstall via Codex's plugin manager after stopping/revoking Full projects. Uninstalling the plugin
 does not delete history or revoke a still-running remote connection; keep or manually archive state.
