@@ -11,6 +11,35 @@
 CCB 是独立社区 Codex 插件：普通 ChatGPT 按需参与重要分析、决策和独立复核，
 Codex 负责本地修改和测试。使用你自己的账号，无需 OpenAI API Key，不调用 ChatGPT Work。
 
+## 项目背景：为什么做这个
+
+在 Codex 中读代码、改文件和运行测试很方便；讨论复杂方案或独立复核时，
+也希望让自己日常使用的普通 ChatGPT 参与。手动在两个会话之间复制材料、说明项目背景、
+追踪回复和把结论带回工作区，容易遗漏上下文，也会打断执行节奏。
+
+CCB 的目的不是替换 Codex，也不是每一步都再调用一个模型，而是把这段交接组织起来：
+用简单的会话开关选择协作，在有价值的分析与复核节点提供必要证据，再由 Codex 继续执行。
+同时探索减少部分 Codex 分析负担的可能性；这不等于已验证节省额度或缩短总耗时，
+ChatGPT 分析本身可能需要较长等待。
+
+本项目是社区方案的整合与扩展，不是所有底层能力从零自研。具体来源和贡献边界见下节。
+
+## 借鉴、集成与致谢
+
+感谢 [XiaoDuoYa/codex-with-chatgpt](https://github.com/XiaoDuoYa/codex-with-chatgpt)。
+它是 CCB Full 模式的直接上游：本仓库内置其锁定版本，复用只读工作区 MCP、
+OAuth/配对、隧道及执行证据等能力，不需要同事另外克隆上游仓库。
+
+| 来源 | CCB 如何使用 | 贡献边界 |
+|---|---|---|
+| `codex-with-chatgpt`（MIT） | 内置并调用锁定源码；提交与校验清单见 [UPSTREAM.json](UPSTREAM.json) | Full 后端是上游成果，不作为 CCB 原创 |
+| OpenAI Codex 插件规范及官方 plugin-creator 辅助工具 | 用于插件封装和便捷安装；见[官方说明](https://developers.openai.com/plugins/build/plugins) | 属于宿主平台能力和安装依赖，不是 CCB 自研聊天服务 |
+| CCB 集成层 | 会话级按需协作、Lite 快照、项目与聊天绑定、交接记录与恢复、插件打包及隐私检查 | 本项目在上述能力上增加的工作流与工具 |
+
+当前直接内置的第三方项目是上述 `codex-with-chatgpt`，不是多个仓库代码的无差别拼装。
+保留其源码、MIT 许可证和作者归属；更多依赖以各自清单及许可证为准。
+详见 [第三方声明](THIRD_PARTY_NOTICES.md)。不表示上游作者或 OpenAI 对本项目背书。
+
 ## 怎么用
 
 | 你说的话 | 工具如何处理 |
@@ -66,6 +95,28 @@ CCB 的 POSIX 快照与锁实现不支持原生 Windows。
 克隆本仓库（需要访问权限），或将发布包解压到长期保留的目录。
 更新前检查现有改动，使用 `git pull --ff-only`，分叉时正常解决冲突。
 
+### 给同事：完整程序包还是 GitHub？
+
+两者是同一套程序的不同分发方式，**完整程序包不等于 Full 已配置好**。
+包内包含 Lite 和 Full 所需源码及锁定的上游代码，但不是携带全部依赖的离线安装器，
+不包含账号、授权、隧道运行状态或预装依赖。每个人仍须使用自己的账号并完成本机验证。
+
+- **首次少量同事试用：**可直接提供经检查的发布 ZIP，适合没有仓库权限或不常用 Git 的人。
+  解压根目录有 `INSTALL.md`；实际插件源码在 `plugins/chatgpt-codex-bridge/`。
+- **持续使用或参与维护：**推荐从 GitHub 克隆，便于查看版本、更新和提交问题。
+  私有仓库必须先获得访问权限；拿到链接不等于可以下载。本仓库的源码 ZIP 与
+  `scripts/release.py` 生成的 marketplace ZIP 结构不同，不要混用目录说明。
+
+GitHub 首次安装（目标目录已存在时先检查，不覆盖、不重新初始化 Git）：
+
+```bash
+git clone https://github.com/Younglu125/chatgpt-codex-bridge.git
+cd chatgpt-codex-bridge
+```
+
+以下命令在插件源码根目录执行。使用发布 ZIP 时，先进入其
+`plugins/chatgpt-codex-bridge/`，不是最外层目录。
+
 ```bash
 python3 --version                         # 需要 3.12+
 python3 scripts/install_plugin.py         # 首次 Lite；更新保留已有 Full
@@ -84,6 +135,12 @@ python3 scripts/install_plugin.py --mode full  # 需要 Full 时
 Full 首次由 Skill 识别 checkout、配置项目服务、引导连接器和 OAuth。
 你处理必要登录、验证码、双重验证和授权。每个项目/每台 Mac 独立配置并真实验证文件读取。
 临时隧道重启可能换地址，固定域名可选。不要复制其他机器的凭据和运行状态。
+
+验收分两步：先真实发送一次分析请求并读回完整回复，再对需要 Full 的项目验证连接器
+实际读取正确工作区和文件。仅安装成功、服务启动或看到连接器名称均不代表 Full 连通。
+日常 Git 更新使用 `git status` → `git pull --ff-only` → 安装脚本 → 新开任务；
+有本地改动或分叉时先保留并处理。曾使用历史清理前版本的维护者另见
+[一次性历史迁移说明](OTHER_MAC_UPDATE.zh-CN.md)，不能直接合并旧历史。
 
 ## 日常恢复
 
