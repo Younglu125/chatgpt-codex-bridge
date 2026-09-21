@@ -44,7 +44,7 @@ OAuth/配对、隧道及执行证据等能力，无需另外克隆上游仓库�
 **如果你希望直接采用“ChatGPT 规划与审查、Codex 执行”的实时 MCP 工作流，上游本身就可以满足这类需求。
 CCB 的价值是在复用这套后端的基础上，让你选择何时协作、如何提供证据，以及如何记录和收回分析结果。**
 
-以下对照基于 CCB 0.2.10 与锁定的上游提交
+以下对照基于 CCB 0.2.11 与锁定的上游提交
 [`9663b887`](https://github.com/XiaoDuoYa/codex-with-chatgpt/tree/9663b88753e35c76796c5bce000293e0bd22cd9e)，
 不是对上游未来版本的能力限制。
 
@@ -105,8 +105,8 @@ CCB 使用宿主公开提供的浏览器操作能力，不提取登录凭据或�
 | [Responses API 后台任务](https://developers.openai.com/api/docs/guides/background) + [Webhooks](https://developers.openai.com/api/docs/guides/webhooks) + [MCP](https://developers.openai.com/api/docs/guides/tools-connectors-mcp) | 程序发起分析，完成后由事件触发后续处理 | 更适合可编程异步调度，但改成了需要 API 凭据的 API 工作流，不是驱动用户原有普通 ChatGPT 聊天；不能承诺沿用其订阅额度或零费用，当前未实现 |
 | [Codex SDK](https://learn.chatgpt.com/docs/codex-sdk) / [App Server](https://learn.chatgpt.com/docs/app-server#lifecycle-overview) | 程序控制 Codex，接收流式事件和完成通知 | 若目标是自动化 Codex 本身，这是官方路线；不能把 Codex 的 `turn/completed` 直接解释成普通 ChatGPT 聊天的完成订阅接口 |
 
-仓库保留了早期官方 Tunnel 客户端辅助脚本，但它们不等于当前 Full 已迁移：默认 Full 仍走
-锁定上游的 Quick Tunnel/OAuth 路径。迁移需要另行核对当前客户端命令、工作区权限、OAuth
+0.2.11 已移除早期 Tunnel 客户端与临时公网端点测试启动脚本。默认 Full 仍走
+锁定上游的 Quick Tunnel/OAuth 路径。未来迁移需要另行核对当前客户端命令、工作区权限、OAuth
 可达性及真实文件读取，不能只换隧道地址；本轮没有修改这些实现或要求新增凭据。
 
 **当前选择：**保留“普通 ChatGPT 协作、不要求推理 API key”的目标时，继续使用现有 MCP，
@@ -169,7 +169,7 @@ CCB 增加打包、证据交接和按需会话协调，保留上游源码和许�
 
 ## 安装
 
-**0.2.10 预览版。** macOS 已做本机验收；Linux/WSL2 是兼容目标，尚需独立验收。
+**0.2.11 预览版。** macOS 已做本机验收；Linux/WSL2 是兼容目标，尚需独立验收。
 CCB 的 POSIX 快照与锁实现不支持原生 Windows。
 
 ### 1. 获取程序
@@ -183,6 +183,10 @@ CCB 的 POSIX 快照与锁实现不支持原生 Windows。
 
 发布包包含 Lite / Full 源码及锁定的上游代码，不是离线安装器，也不包含账号、授权或
 预装依赖。**获取完整程序不等于完成 Full 配置**，仍需使用自己的账号完成本机配置与验证。
+
+用户运行包不再包含本项目的测试和 CI 配置，开发验证请使用 Git 源码。
+无引用示例、宣传素材和退役的实验启动脚本已移除。锁定的上游目录仍完整保留，
+包括其测试、许可和依赖锁文件，便于校验来源；Lite、可选冻结 MCP 和 Full 功能均保留。
 
 GitHub 首次安装（目标目录已存在时先检查，不覆盖、不重新初始化 Git）：
 
@@ -263,10 +267,11 @@ python3 scripts/release.py --output release
 发布包没有 .git，不代表旧提交作者信息已删除。
 详见 [分享审查](SHARING_REVIEW.md)、[发布清单](RELEASE.md)、[验收记录](VALIDATION.md)。
 
-## 使用效果与开发
+## 开发与验证
 
-[演示截图及 X 文案](marketing/README.md) 来自真实本地程序输出，
-明确标记为 CLI 演示，不伪装成 ChatGPT 对话或新一轮 Full 验证。
+以下命令在 Git 源码目录执行，不适用于精简后的用户运行包。Python 依赖以
+`pyproject.toml` 和文档中的 pip/setup 安装方式为准；仍描述 0.1.0 且把 MCP 当作必需依赖的
+旧根目录 `uv.lock` 已移除，上游锁文件不变。
 
 ```bash
 python3 -m venv .venv

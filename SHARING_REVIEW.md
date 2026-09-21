@@ -1,5 +1,9 @@
 # Sharing review · 0.2.9
 
+Historical review below. Version 0.2.11 removed the old demonstration screenshots and promotional
+drafts; they are not part of the current source or runtime package. Current validation is recorded
+in VALIDATION.md. Historical statements do not imply those assets are still distributed.
+
 ## Findings and changes
 
 - Removed a developer-specific umbrella-folder name from project registration. Root/home guards remain;

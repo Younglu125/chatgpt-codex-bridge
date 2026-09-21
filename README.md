@@ -48,7 +48,7 @@ No endorsement by upstream authors or OpenAI is implied.
 CCB builds on that backend to add choices about when to collaborate, how to supply evidence, and how
 to record and collect the resulting analysis.**
 
-This comparison covers CCB 0.2.10 and the pinned upstream revision
+This comparison covers CCB 0.2.11 and the pinned upstream revision
 [`9663b887`](https://github.com/XiaoDuoYa/codex-with-chatgpt/tree/9663b88753e35c76796c5bce000293e0bd22cd9e),
 not a claim about what future upstream versions can or cannot do.
 
@@ -116,8 +116,8 @@ every alternative in CCB. File connectivity, messaging and task scheduling are s
 | [Responses API background mode](https://developers.openai.com/api/docs/guides/background) + [Webhooks](https://developers.openai.com/api/docs/guides/webhooks) + [MCP](https://developers.openai.com/api/docs/guides/tools-connectors-mcp) | Programmatic analysis followed by event-triggered processing | Better suited to asynchronous orchestration, but changes the workflow to an API integration with API credentials, not the user's existing ordinary ChatGPT chat. No promise of subscription-quota reuse or free usage; not implemented here |
 | [Codex SDK](https://learn.chatgpt.com/docs/codex-sdk) / [App Server](https://learn.chatgpt.com/docs/app-server#lifecycle-overview) | Programmatic Codex control with streamed events and completion notifications | The official route when automating Codex itself. Its `turn/completed` event must not be presented as a completion subscription for ordinary ChatGPT chats |
 
-The repository retains earlier official Tunnel-client helpers; their presence does not mean Full
-has migrated. Default Full still uses the pinned upstream's Quick Tunnel/OAuth path. A migration
+Version 0.2.11 removes the early Tunnel-client and temporary public-endpoint test wrappers.
+Default Full still uses the pinned upstream's Quick Tunnel/OAuth path. A future migration
 needs current CLI, workspace-permission, OAuth reachability and actual file-read checks, not just a
 replacement tunnel address. This documentation update changes neither implementation nor credentials.
 
@@ -184,7 +184,7 @@ prove Full access. Healthy project connections are reused.
 
 ## Install
 
-**0.2.10 preview.** macOS has been exercised. Linux/WSL2 remains a compatibility target.
+**0.2.11 preview.** macOS has been exercised. Linux/WSL2 remains a compatibility target.
 Native Windows is not supported by CCB's POSIX snapshot/locking layer.
 
 ### 1. Get the program
@@ -199,6 +199,11 @@ Clone with Git or extract a release ZIP into a permanent directory.
 The release includes Lite/Full source and the pinned upstream code, but is not an offline installer.
 Accounts, authorizations and preinstalled dependencies are not included. **A complete package is not
 an already-connected Full setup.** Use your own account to configure and verify your local setup.
+
+Runtime packages omit first-party tests and CI configuration; these remain in the Git source for
+development and verification. Unused demos, promotional assets and retired experimental launchers
+have been removed. The pinned upstream tree stays complete, including its tests, licenses and
+dependency locks, so its identity remains verifiable. Lite, optional frozen MCP and Full are retained.
 
 First clone (if the destination exists, inspect it; do not overwrite or initialize it again):
 
@@ -286,10 +291,11 @@ The heuristic scanner reports common private patterns without printing their val
 Inspect images visually and Git metadata separately. A clean ZIP does not sanitize Git history.
 See [sharing review](SHARING_REVIEW.md), [release checklist](RELEASE.md) and [validation](VALIDATION.md).
 
-## Screenshots and contributing
+## Development and verification
 
-[Demonstration screenshots and X drafts](marketing/README.md) use actual local helper output.
-They are CLI demonstrations, not fabricated ChatGPT conversations or fresh Full proofs.
+Run the following in a Git source checkout, not the slim runtime package. Python dependencies are
+declared in `pyproject.toml` and installed by the documented pip/setup commands; the obsolete root
+`uv.lock` (which still described 0.1.0 with mandatory MCP) was removed. Upstream locks are unchanged.
 
 ```bash
 python3 -m venv .venv

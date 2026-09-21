@@ -1,4 +1,20 @@
-# Validation — 0.2.10 integration candidate
+# Validation — 0.2.11 integration candidate
+
+2026-09-21 cleanup validation: 87 Python tests passed. The new runtime-package regression checks
+that first-party tests, CI, retired examples, promotional material and obsolete launchers are absent,
+while Lite, frozen MCP, installer inputs and the complete pinned upstream remain available. It also
+executes the packaged packager again to verify a release extraction can still be used by the
+convenience installer. Current first-party tests remain in Git; no coverage was removed.
+Retired files are recoverable from Git history and the maintainer's separate local backup, neither
+of which is included in the runtime package. This is a cleanup release, not new remote acceptance.
+An independent read-only review found no blocking issue and ran 49 relevant checks. A clean package
+in a directory with spaces passed standard-library-only Lite setup/doctor with isolated empty state,
+then locked Full dependency installation and build. The unchanged upstream passed 178 tests in
+17 files and TypeScript build. Source privacy/history scans found no flagged data or binary assets;
+plugin/skill validators and first-party local documentation link checks passed. Old 0.2.9 and
+0.2.10 ZIP hashes were unchanged. These remain same-machine checks, not second-user acceptance.
+
+## Previous patch: 0.2.10
 
 2026-09-21 patch validation: 86 Python tests passed, including final-response selection,
 truncation/ambiguity rejection, 13 installer transition tests and two immutable-release checks.

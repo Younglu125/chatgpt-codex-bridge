@@ -11,14 +11,16 @@ import uuid
 ROOT=Path(__file__).resolve().parents[1]
 FILES=['plugin.json','.codex-plugin/plugin.json','.mcp.json','bridge.py','server.py','oauth_provider.py','pyproject.toml','README.md','README.zh-CN.md','WORKFLOW.md','RELEASE.md','VALIDATION.md','LICENSE','THIRD_PARTY_NOTICES.md','UPSTREAM.json','USAGE.zh-CN.md']
 FILES += ['SHARING_REVIEW.md','OTHER_MAC_UPDATE.zh-CN.md']
-DIRS=['.github','skills','scripts','tests','examples','vendor','marketing']
+# First-party tests and CI stay in the source repository, not the runtime package.
+# Keep the pinned upstream whole so its manifest and runbook remain verifiable.
+DIRS=['skills','scripts','vendor']
 EXCLUDED={'.git','.venv','.tooling','node_modules','__pycache__','.pytest_cache','dist','validation','release'}
 
 def build(output):
     output=Path(output).expanduser().absolute()
     if output.resolve()==ROOT or ROOT.is_relative_to(output.resolve()):
         raise ValueError('output must not replace source or its parent')
-    for name in DIRS:
+    for name in [*DIRS, 'tests', '.github', 'examples', 'marketing']:
         if output.resolve().is_relative_to((ROOT/name).resolve()):
             raise ValueError('output cannot be inside a packaged input directory')
     output.parent.mkdir(parents=True,exist_ok=True)

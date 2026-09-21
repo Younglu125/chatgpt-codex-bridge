@@ -1,5 +1,13 @@
 # Release acceptance
 
+0.2.11 is a distribution cleanup: removes unused calculator/demo assets, promotional screenshots
+and drafts, early Tunnel/public-endpoint test wrappers and the stale first-party uv lock. Runtime
+packages omit first-party tests and CI, while the Git source retains current regression tests.
+The pinned upstream tree, licenses and dependency locks remain intact. Lite, frozen MCP and Full
+are retained. Validate both clean runtime repackaging and Full builds before release.
+
+## Previous patch
+
 0.2.10 hardens final-response collection and stages installer builds before switching packages.
 Failed preparation leaves the previous installation in place; registration failure attempts file,
 marketplace and host-registration recovery and reports incomplete recovery explicitly. Auto upgrades
@@ -12,6 +20,8 @@ It remains a portable integration
 release candidate until a second machine validates installation.
 The target ChatGPT connector path has been exercised. Do not turn this label into a verified-stable
 claim by editing docs.
+
+## Acceptance checklist
 
 1. Run Python tests, vendored backend build/tests and plugin/skill validators.
 2. Generate an allowlisted package using package_plugin.py. Scan output for personal home paths,

@@ -146,3 +146,24 @@ def test_vendored_sources_match_pin():
     vendor=ROOT/'vendor/codex-with-chatgpt'
     for rel,sha in lock['sha256'].items():
         assert hashlib.sha256((vendor/rel).read_bytes()).hexdigest()==sha, rel
+
+
+def test_runtime_package_excludes_development_and_retired_helpers(tmp_path):
+    dest = tmp_path / 'clean runtime'
+    module('package_plugin').build(dest)
+    for name in ('.github', 'tests', 'examples', 'marketing',
+                 'scripts/render_share_demo.cjs', 'scripts/install_tunnel_client.py',
+                 'scripts/tunnel', 'scripts/public-mcp', 'scripts/public_mcp.py'):
+        assert not (dest / name).exists(), name
+    for name in ('bridge.py', 'server.py', 'oauth_provider.py', 'scripts/setup.py',
+                 'scripts/install_plugin.py', 'scripts/mcp-launch.py',
+                 'vendor/codex-with-chatgpt/src/cli/index.ts',
+                 'vendor/codex-with-chatgpt/tests/mcp-integration.test.ts'):
+        assert (dest / name).is_file(), name
+    # A release extraction must still support the documented convenience installer,
+    # which repackages its own inputs before switching the personal installation.
+    rebuilt = tmp_path / 'repacked runtime'
+    subprocess.run([sys.executable, str(dest / 'scripts/package_plugin.py'),
+                    '--output', str(rebuilt)], check=True, capture_output=True)
+    assert (rebuilt / 'bridge.py').read_bytes() == (dest / 'bridge.py').read_bytes()
+    assert not (rebuilt / 'tests').exists()
