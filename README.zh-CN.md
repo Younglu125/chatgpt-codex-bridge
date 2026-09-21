@@ -28,7 +28,7 @@ ChatGPT 分析本身可能需要较长等待。
 
 感谢 [XiaoDuoYa/codex-with-chatgpt](https://github.com/XiaoDuoYa/codex-with-chatgpt)。
 它是 CCB Full 模式的直接上游：本仓库内置其锁定版本，复用只读工作区 MCP、
-OAuth/配对、隧道及执行证据等能力，不需要同事另外克隆上游仓库。
+OAuth/配对、隧道及执行证据等能力，无需另外克隆上游仓库。
 
 | 来源 | CCB 如何使用 | 贡献边界 |
 |---|---|---|
@@ -36,8 +36,7 @@ OAuth/配对、隧道及执行证据等能力，不需要同事另外克隆上�
 | OpenAI Codex 插件规范及官方 plugin-creator 辅助工具 | 用于插件封装和便捷安装；见[官方说明](https://developers.openai.com/plugins/build/plugins) | 属于宿主平台能力和安装依赖，不是 CCB 自研聊天服务 |
 | CCB 集成层 | 会话级按需协作、Lite 快照、项目与聊天绑定、交接记录与恢复、插件打包及隐私检查 | 本项目在上述能力上增加的工作流与工具 |
 
-当前直接内置的第三方项目是上述 `codex-with-chatgpt`，不是多个仓库代码的无差别拼装。
-保留其源码、MIT 许可证和作者归属；更多依赖以各自清单及许可证为准。
+本仓库保留上游源码、MIT 许可证和作者归属；更多依赖以各自清单及许可证为准。
 详见 [第三方声明](THIRD_PARTY_NOTICES.md)。不表示上游作者或 OpenAI 对本项目背书。
 
 ## 怎么用
@@ -92,20 +91,17 @@ CCB 增加打包、证据交接和按需会话协调，保留上游源码和许�
 **0.2.9 预览版。** macOS 已做本机验收；Linux/WSL2 是兼容目标，尚需独立验收。
 CCB 的 POSIX 快照与锁实现不支持原生 Windows。
 
-克隆本仓库（需要访问权限），或将发布包解压到长期保留的目录。
-更新前检查现有改动，使用 `git pull --ff-only`，分叉时正常解决冲突。
+### 1. 获取程序
 
-### 给同事：完整程序包还是 GitHub？
+可选择 Git 克隆或发布 ZIP，程序目录应长期保留。
 
-两者是同一套程序的不同分发方式，**完整程序包不等于 Full 已配置好**。
-包内包含 Lite 和 Full 所需源码及锁定的上游代码，但不是携带全部依赖的离线安装器，
-不包含账号、授权、隧道运行状态或预装依赖。每个人仍须使用自己的账号并完成本机验证。
+- **Git 克隆：**便于后续更新。仓库访问受限时，需要先获得访问权限。
+- **发布 ZIP：**解压后阅读根目录的 `INSTALL.md`；插件源码位于
+  `plugins/chatgpt-codex-bridge/`。GitHub 的源码 ZIP 与发布 ZIP 目录结构不同，
+  源码 ZIP 中的安装脚本直接位于解压后的仓库根目录。
 
-- **首次少量同事试用：**可直接提供经检查的发布 ZIP，适合没有仓库权限或不常用 Git 的人。
-  解压根目录有 `INSTALL.md`；实际插件源码在 `plugins/chatgpt-codex-bridge/`。
-- **持续使用或参与维护：**推荐从 GitHub 克隆，便于查看版本、更新和提交问题。
-  私有仓库必须先获得访问权限；拿到链接不等于可以下载。本仓库的源码 ZIP 与
-  `scripts/release.py` 生成的 marketplace ZIP 结构不同，不要混用目录说明。
+发布包包含 Lite / Full 源码及锁定的上游代码，不是离线安装器，也不包含账号、授权或
+预装依赖。**获取完整程序不等于完成 Full 配置**，仍需使用自己的账号完成本机配置与验证。
 
 GitHub 首次安装（目标目录已存在时先检查，不覆盖、不重新初始化 Git）：
 
@@ -113,6 +109,8 @@ GitHub 首次安装（目标目录已存在时先检查，不覆盖、不重新�
 git clone https://github.com/Younglu125/chatgpt-codex-bridge.git
 cd chatgpt-codex-bridge
 ```
+
+### 2. 安装插件
 
 以下命令在插件源码根目录执行。使用发布 ZIP 时，先进入其
 `plugins/chatgpt-codex-bridge/`，不是最外层目录。
@@ -128,6 +126,8 @@ python3 scripts/install_plugin.py --mode full  # 需要 Full 时
 `codex plugin marketplace add <解压目录>`，再从该 marketplace 安装 CCB。
 参见 [官方插件说明](https://developers.openai.com/plugins/build/plugins)。
 
+### 3. 开始使用与首次配置
+
 **安装或更新后新开 Codex 任务。** 在实际项目中说：
 
 > CCB，分析这个项目并建议下一步。
@@ -138,6 +138,9 @@ Full 首次由 Skill 识别 checkout、配置项目服务、引导连接器和 O
 
 验收分两步：先真实发送一次分析请求并读回完整回复，再对需要 Full 的项目验证连接器
 实际读取正确工作区和文件。仅安装成功、服务启动或看到连接器名称均不代表 Full 连通。
+
+### 4. 更新
+
 日常 Git 更新使用 `git status` → `git pull --ff-only` → 安装脚本 → 新开任务；
 有本地改动或分叉时先保留并处理。曾使用历史清理前版本的维护者另见
 [一次性历史迁移说明](OTHER_MAC_UPDATE.zh-CN.md)，不能直接合并旧历史。
