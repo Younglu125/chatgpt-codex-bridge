@@ -71,6 +71,50 @@ CCB 不是更强的模型或重新实现的 MCP 安全后端。Full 的只读访
 不宣称比上游更快、更稳定或更省额度。实现依据见 [会话控制](scripts/session.py)、
 [路由](scripts/route.py)、[交接记录](bridge.py) 和 [消息通道说明](skills/chatgpt-codex-bridge/references/transport.md)。
 
+## 为什么不只让 Codex 操作本地浏览器？
+
+**不是不采用浏览器，而是不把浏览器作为唯一通道。** CCB 在当前宿主确实提供原生聊天
+工具时优先使用；工具不可用时，可以操作已授权的浏览器。用户明确指定浏览器时遵从用户选择。
+无论走哪条消息通道，Full 都可以让 ChatGPT 自己通过 MCP 读取文件：
+**浏览器/原生工具负责发送问题、收回答案，MCP 负责提供项目文件；两者不是替代关系。**
+
+优先原生工具是本项目的工程取舍：结构化会话 ID、消息 ID 和状态更便于核对目标、保存回执、
+恢复同一任务，减少对按钮位置、页面布局和正文展开状态的依赖。这不是性能测试结论，
+也不代表原生接口不会截断、浏览器必然更慢，或每个 Codex 客户端都有这些工具。
+本机可调用的聊天工具不能被宣传为面向所有开发者的通用 ChatGPT 会话 API。
+
+需要核对可见模型、账号、连接器或处理页面操作时，浏览器仍有价值。
+官方支持[内置浏览器](https://learn.chatgpt.com/docs/browser)及
+[浏览器扩展](https://learn.chatgpt.com/docs/chrome-extension)：内置浏览器有独立登录环境，
+扩展可使用用户已有的浏览器标签页和登录状态；均受客户端、工作区与网站权限限制。
+CCB 使用宿主公开提供的浏览器操作能力，不提取登录凭据或调用未公开的聊天接口。
+浏览器收集仍需完整可观察的正文、稳定消息标识及结束标记，不能以“页面看起来结束了”代替验收。
+
+**换成浏览器不会自动消除等待 token。** 若 Codex 仍反复恢复模型来查看页面，依然有
+上下文处理开销。0.2.10 采用简短状态检查，完成后再取全文；原生与浏览器都不承诺零等待成本。
+
+## 有没有更官方、更合适的方案？
+
+以下为 **2026-09-21 官方文档核对**，不是这些替代方案在 CCB 中全部验收通过。
+“更官方”要区分文件连接、消息收发和任务调度，不能把其中一项当作整条链路的替代品。
+
+| 方案 | 适用目标 | 与当前 CCB 的关系及边界 |
+|---|---|---|
+| [ChatGPT Developer mode + MCP](https://developers.openai.com/api/docs/guides/developer-mode) | 让普通 ChatGPT 调用授权工具、读取项目 | Full 已采用这一官方客户端能力；本地后端、授权与隧道封装来自锁定的社区上游，CCB 整体仍是社区项目 |
+| [OpenAI Secure MCP Tunnel](https://developers.openai.com/api/docs/guides/secure-mcp-tunnels) | 私有 MCP 不开放公网入口 | 值得优先评估的连接替代：需要 Platform Tunnel 权限、运行 API key 及正确的 ChatGPT 工作区关联；不是发消息或完成通知接口。官方限定为私有连接/开发测试，不用于公开插件目录分发 |
+| [Responses API 后台任务](https://developers.openai.com/api/docs/guides/background) + [Webhooks](https://developers.openai.com/api/docs/guides/webhooks) + [MCP](https://developers.openai.com/api/docs/guides/tools-connectors-mcp) | 程序发起分析，完成后由事件触发后续处理 | 更适合可编程异步调度，但改成了需要 API 凭据的 API 工作流，不是驱动用户原有普通 ChatGPT 聊天；不能承诺沿用其订阅额度或零费用，当前未实现 |
+| [Codex SDK](https://learn.chatgpt.com/docs/codex-sdk) / [App Server](https://learn.chatgpt.com/docs/app-server#lifecycle-overview) | 程序控制 Codex，接收流式事件和完成通知 | 若目标是自动化 Codex 本身，这是官方路线；不能把 Codex 的 `turn/completed` 直接解释成普通 ChatGPT 聊天的完成订阅接口 |
+
+仓库保留了早期官方 Tunnel 客户端辅助脚本，但它们不等于当前 Full 已迁移：默认 Full 仍走
+锁定上游的 Quick Tunnel/OAuth 路径。迁移需要另行核对当前客户端命令、工作区权限、OAuth
+可达性及真实文件读取，不能只换隧道地址；本轮没有修改这些实现或要求新增凭据。
+
+**当前选择：**保留“普通 ChatGPT 协作、不要求推理 API key”的目标时，继续使用现有 MCP，
+按宿主能力选择原生或官方浏览器工具。若首要目标改为可靠的完成事件和程序化调度，
+再单独评估 Responses API；若只需另一位 Codex 分析/复核，优先评估官方 Codex SDK。
+本次未找到可据此承诺“任意普通 ChatGPT 聊天都能公开订阅完成事件”的官方文档，
+因此不声称当前轮询已被官方事件接口替代。
+
 ## 怎么用
 
 | 你说的话 | 工具如何处理 |

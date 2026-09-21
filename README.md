@@ -78,6 +78,56 @@ No greater speed, stability or quota savings are claimed. See the implementation
 [conversation control](scripts/session.py), [routing](scripts/route.py), [handoff records](bridge.py)
 and [message transport](skills/chatgpt-codex-bridge/references/transport.md).
 
+## Why not just have Codex operate the local browser?
+
+**CCB supports the browser; it does not make it the only transport.** Native chat tools take
+precedence only when the current host actually exposes them; an authorized browser is another route.
+An explicit user choice of browser takes precedence. Either messaging route can use Full:
+**the browser/native tools send questions and collect answers; MCP supplies project files.**
+Browser automation and ChatGPT-initiated MCP reads are not competing designs.
+
+Native-first is an engineering choice: structured conversation/message IDs and statuses help match
+requests, retain receipts and resume the same job with less dependence on page layout, buttons and
+expanded text. It is not a benchmark, a claim that native responses never truncate, or a guarantee
+that every Codex client has these tools. Host-exposed chat tools are not a universal public API for
+third-party developers to control ordinary ChatGPT conversations.
+
+The browser remains useful for checking visible model/account/connector details and handling UI-only
+steps. OpenAI documents both a [built-in browser](https://learn.chatgpt.com/docs/browser) and a
+[browser extension](https://learn.chatgpt.com/docs/chrome-extension). The former has a separate
+browser profile; the latter can use existing signed-in tabs. Availability and access depend on the
+client, workspace and website permissions. CCB uses supported host browser controls, not extracted
+credentials or undocumented chat endpoints. Collection still requires complete observable text,
+stable message identifiers and the completion marker, not merely a page that appears finished.
+
+**Switching to a browser does not make waiting token-free.** Repeatedly waking Codex to inspect a
+page still incurs context processing. Version 0.2.10 uses compact status checks and retrieves full
+text at completion; neither messaging route promises zero waiting cost.
+
+## Are there more official or better-fitting options?
+
+**Official documentation checked on 2026-09-21.** This is a comparison, not acceptance testing of
+every alternative in CCB. File connectivity, messaging and task scheduling are separate concerns.
+
+| Option | Best fit | Relationship to CCB and limitations |
+|---|---|---|
+| [ChatGPT Developer mode + MCP](https://developers.openai.com/api/docs/guides/developer-mode) | Ordinary ChatGPT calling authorized tools and reading projects | Full already uses this official client capability. The local backend, authorization and tunnel integration come from the pinned community upstream; CCB remains a community project |
+| [OpenAI Secure MCP Tunnel](https://developers.openai.com/api/docs/guides/secure-mcp-tunnels) | Keeping a private MCP server off the public internet | A connectivity alternative worth evaluating. Requires Platform Tunnel permissions, a runtime API key and correct ChatGPT workspace association; does not send chat messages or report analysis completion. Supports private/developer connections, not public plugin-directory distribution |
+| [Responses API background mode](https://developers.openai.com/api/docs/guides/background) + [Webhooks](https://developers.openai.com/api/docs/guides/webhooks) + [MCP](https://developers.openai.com/api/docs/guides/tools-connectors-mcp) | Programmatic analysis followed by event-triggered processing | Better suited to asynchronous orchestration, but changes the workflow to an API integration with API credentials, not the user's existing ordinary ChatGPT chat. No promise of subscription-quota reuse or free usage; not implemented here |
+| [Codex SDK](https://learn.chatgpt.com/docs/codex-sdk) / [App Server](https://learn.chatgpt.com/docs/app-server#lifecycle-overview) | Programmatic Codex control with streamed events and completion notifications | The official route when automating Codex itself. Its `turn/completed` event must not be presented as a completion subscription for ordinary ChatGPT chats |
+
+The repository retains earlier official Tunnel-client helpers; their presence does not mean Full
+has migrated. Default Full still uses the pinned upstream's Quick Tunnel/OAuth path. A migration
+needs current CLI, workspace-permission, OAuth reachability and actual file-read checks, not just a
+replacement tunnel address. This documentation update changes neither implementation nor credentials.
+
+**Current choice:** retain MCP plus host-supported native or official browser messaging when the goal
+is ordinary ChatGPT collaboration without an inference API key. Evaluate Responses API separately if
+reliable completion events and programmatic orchestration become the priority; evaluate the official
+Codex SDK if another Codex analysis/review agent is sufficient. This search did not establish a public
+completion-subscription contract for arbitrary ordinary ChatGPT chats, so CCB does not claim that
+official event notifications have replaced its polling.
+
 ## A small switch, a natural workflow
 
 | Your request | What happens |
