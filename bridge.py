@@ -364,11 +364,13 @@ class Store:
             raise ValueError("only a native completed turn can recover a marker-only cancellation")
         if data["thread"]["id"] != job["target"]["id"] or data["thread"]["kind"] != "chatgpt":
             raise ValueError("wrong conversation")
+        if data.get("truncated"):
+            raise ValueError("response is truncated; read complete evidence, do not resend")
         marker = f"BRIDGE_REQUEST:{job_id}"
         done = f"BRIDGE_DONE:{job_id}"
         prompt = self.prompt(job_id)
         for turn in data["turns"]:
-            if turn.get("status") != "completed" or turn.get("error"):
+            if turn.get("status") != "completed" or turn.get("error") or turn.get("truncated"):
                 continue
             items = turn["items"]
             for position, item in enumerate(items):
@@ -377,32 +379,50 @@ class Store:
                     continue
                 if user != prompt:
                     raise ValueError("echoed request differs from dispatched prompt")
+                if item.get("truncated") or any(x.get("truncated") for x in item.get("content", [])):
+                    raise ValueError("request is truncated; read complete evidence, do not resend")
+                answers = []
+                next_user = False
                 for answer in items[position + 1:]:
                     if answer.get("type") == "userMessage":
+                        next_user = True
                         break
-                    text = answer.get("text", "").strip()
-                    marker_complete = text.endswith(done)
-                    native_complete = (
-                        data.get("source") != "browser-ui"
-                        and data["thread"].get("status", {}).get("type") == "idle"
-                        and bool(text)
-                    )
-                    if answer.get("type") == "agentMessage" and answer.get("id") not in job["baseline_ids"] and answer.get("id") and (marker_complete or native_complete):
-                        dump(self.job_dir(job_id) / "response.json", data)
-                        (self.job_dir(job_id) / "analysis.md").write_text(text + "\n", encoding="utf-8")
-                        os.chmod(self.job_dir(job_id) / "analysis.md", 0o600)
-                        if recovering:
-                            job["recovered_from_cancelled_at"] = job.pop("cancelled_at", None)
-                            job["recovered_cancel_reason"] = job.pop("cancel_reason", None)
-                        job.update(
-                            state="analyzed",
-                            user_message_id=item["id"],
-                            assistant_message_id=answer["id"],
-                            completion_proof="marker" if marker_complete else "native_completed_turn",
-                            collected_at=now(),
-                        )
-                        self.save_job(job)
-                        return job
+                    if answer.get("type") == "agentMessage":
+                        answers.append(answer)
+                if not answers:
+                    continue
+                # Inspect the entire matching interval before choosing a reply. The first
+                # assistant item may be progress, and an earlier marker may be superseded.
+                answer = answers[-1]
+                text = answer.get("text", "").strip()
+                if not text or not answer.get("id") or answer["id"] in job["baseline_ids"]:
+                    continue
+                if answer.get("truncated") or any(x.get("truncated") for x in answer.get("content", [])):
+                    raise ValueError("answer is truncated; read complete evidence, do not resend")
+                marker_complete = text.splitlines()[-1].strip() == done
+                native_complete = (
+                    data.get("source") != "browser-ui"
+                    and data["thread"].get("status", {}).get("type") == "idle"
+                    and len(answers) == 1
+                    and not next_user
+                )
+                if not (marker_complete or native_complete):
+                    raise ValueError("ambiguous or incomplete final response; read the same job, do not resend")
+                dump(self.job_dir(job_id) / "response.json", data)
+                (self.job_dir(job_id) / "analysis.md").write_text(text + "\n", encoding="utf-8")
+                os.chmod(self.job_dir(job_id) / "analysis.md", 0o600)
+                if recovering:
+                    job["recovered_from_cancelled_at"] = job.pop("cancelled_at", None)
+                    job["recovered_cancel_reason"] = job.pop("cancel_reason", None)
+                job.update(
+                    state="analyzed",
+                    user_message_id=item["id"],
+                    assistant_message_id=answer["id"],
+                    completion_proof="marker" if marker_complete else "native_completed_turn",
+                    collected_at=now(),
+                )
+                self.save_job(job)
+                return job
         raise ValueError("no new completed matching response; continue bounded read polling, do not resend")
 
     def prompt(self, job_id):

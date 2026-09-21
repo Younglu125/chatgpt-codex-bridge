@@ -1,7 +1,14 @@
 # Release acceptance
 
-0.2.9 adds bilingual onboarding, a privacy-scanning release gate and reproducible sharing assets,
-on top of 0.2.8 conversation-scoped, selective ChatGPT participation. It remains a portable integration
+0.2.10 hardens final-response collection and stages installer builds before switching packages.
+Failed preparation leaves the previous installation in place; registration failure attempts file,
+marketplace and host-registration recovery and reports incomplete recovery explicitly. Auto upgrades
+preserve Full, and successful upgrades retain a recoverable package backup. Hard process termination
+or external concurrent changes may still require manual recovery; this is not a cross-system transaction.
+Compact, less frequent waiting probes avoid repeatedly loading old transcripts; final collection still
+requires complete evidence. No measured token-saving percentage is claimed.
+Published versioned artifacts are immutable: keep 0.2.9 intact and publish a new patch version.
+It remains a portable integration
 release candidate until a second machine validates installation.
 The target ChatGPT connector path has been exercised. Do not turn this label into a verified-stable
 claim by editing docs.

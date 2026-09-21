@@ -1,5 +1,6 @@
 """Make a ZIP plus checksums and a repository marketplace; never publish remotely."""
 import argparse
+import fcntl
 import hashlib
 import json
 from pathlib import Path
@@ -12,6 +13,13 @@ from audit_share import scan
 p=argparse.ArgumentParser(description=__doc__);p.add_argument('--output',type=Path,required=True);a=p.parse_args()
 a.output.mkdir(parents=True,exist_ok=True)
 version=json.loads((ROOT/'plugin.json').read_text())['version']
+# Serialize publishers and refuse to rewrite a frozen version, including its checksum.
+release_lock=(a.output/'.ccb-release.lock').open('a')
+fcntl.flock(release_lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+for suffix in ('.zip', '.sha256'):
+    artifact=a.output/f'chatgpt-codex-bridge-{version}{suffix}'
+    if artifact.exists() or artifact.is_symlink():
+        raise SystemExit(f'refusing to overwrite existing release artifact: {artifact.name}')
 with tempfile.TemporaryDirectory(prefix='bridge-release-') as temp:
     stage=Path(temp)/'chatgpt-codex-bridge'
     plugin=stage/'plugins/chatgpt-codex-bridge';build(plugin)

@@ -14,10 +14,11 @@
 
 ## Remaining release boundaries
 
-The repository is private. Anonymous readers cannot clone it merely because the README is shareable.
+Historical status on 2026-09-20: the repository was private; a shareable README alone did not grant anonymous clone access.
+The owner made the repository public on 2026-09-21. This does not change the historical privacy limitations below.
 On 2026-09-20, the owner authorized rewriting an earlier commit's private author/committer identity
 to the maintainer's GitHub noreply identity. The rewritten history preserves every commit's file tree.
-Both main and the v0.2.9 tag are updated with explicit old-ref leases. Repository visibility is unchanged.
+Both main and the v0.2.9 tag were updated with explicit old-ref leases in that authorized migration; that operation did not change repository visibility.
 Existing clones must migrate safely rather than merging the old history back. Old objects may remain
 in local reflogs, other clones or hosting caches; ref rewriting does not guarantee physical erasure.
 See [other-Mac migration](OTHER_MAC_UPDATE.zh-CN.md). Do not publish old bundles or backups.

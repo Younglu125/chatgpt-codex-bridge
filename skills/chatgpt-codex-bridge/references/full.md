@@ -19,8 +19,9 @@ Full itself requires no OpenAI Platform API key.
 Quick Tunnel is the upstream default and provides the complete feature set without a domain or Cloudflare account. Its URL may change after restart; use the upstream doctor/reconnect flow for that project's connector and repeat the identity/read check. A named Cloudflare tunnel is an advanced upstream option for users who explicitly want a stable hostname.
 
 After first verification, reuse is the default. `scripts/route.py` requires the project service,
-tunnel, an issued authorization token and a saved ChatGPT chat that passed workspace/file verification
-before selecting live mode. The saved chat ID must match the current account target; after an account
+tunnel, an issued authorization token and a saved ChatGPT chat before selecting live mode. These are
+local readiness checks, not a persisted remote-read attestation: the operator must still establish
+the actual workspace/file verification described above. The saved chat ID must match the current account target; after an account
 switch, re-verify and save the current chat without repeating OAuth when that account's connector is
 already authorized. Run `doctor` to repair
 an existing connection; do not repeat setup, create another connector, or ask the user to repeat

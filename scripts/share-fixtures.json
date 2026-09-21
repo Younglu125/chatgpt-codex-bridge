@@ -1,6 +1,6 @@
 {
   "tests/test_bridge.py": {
-    "sha256": "5b240654f9d7072c311c6d1f2ecee37a86550bab9bc4f07fb5b1f1a6ae7c6522",
+    "sha256": "fd45c9af9bddaabe8bf0c3704f1c25577ac42bce30b3d7541c2501503e211137",
     "reason": "Reviewed synthetic test fixture or secret-detection pattern; not live personal data."
   },
   "vendor/codex-with-chatgpt/src/execution/sanitize.ts": {

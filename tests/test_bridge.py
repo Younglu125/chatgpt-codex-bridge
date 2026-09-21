@@ -101,6 +101,72 @@ def test_native_completed_turn_can_omit_marker(workspace):
     assert completed["completion_proof"] == "native_completed_turn"
 
 
+def test_collect_skips_progress_and_selects_final_marker(workspace):
+    _, store = workspace
+    job = store.prepare("fixture", "analyze"); store.begin(job["id"], baseline())
+    data = read_result(job, store.prompt(job["id"]))
+    data["turns"][0]["items"].insert(1, {
+        "type": "agentMessage", "id": "progress", "text": "Still reading the files."
+    })
+    result = store.collect(job["id"], data)
+    assert result["assistant_message_id"] == "new-answer"
+    assert result["completion_proof"] == "marker"
+    assert "Fix main.py" in (store.job_dir(job["id"]) / "analysis.md").read_text()
+
+
+@pytest.mark.parametrize("problem", [
+    "ambiguous", "answer-truncated", "turn-truncated", "response-truncated",
+    "request-truncated", "marker-before-later-answer", "cross-user-boundary",
+])
+def test_collect_incomplete_or_ambiguous_native_stays_pending(workspace, problem):
+    _, store = workspace
+    job = store.prepare("fixture", "analyze"); store.begin(job["id"], baseline())
+    data = read_result(job, store.prompt(job["id"]))
+    turn = data["turns"][0]
+    if problem == "ambiguous":
+        turn["items"][1]["text"] = "A possible answer, without a completion marker."
+        turn["items"].insert(1, {"type": "agentMessage", "id": "progress", "text": "Working."})
+    elif problem == "answer-truncated":
+        turn["items"][1]["truncated"] = True
+    elif problem == "turn-truncated":
+        turn["truncated"] = True
+    elif problem == "response-truncated":
+        data["truncated"] = True
+    elif problem == "request-truncated":
+        turn["items"][0]["content"][0]["truncated"] = True
+    elif problem == "marker-before-later-answer":
+        turn["items"].append({"type": "agentMessage", "id": "later", "text": "A further response."})
+    else:
+        turn["items"][1]["text"] = "Still working."
+        turn["items"].extend([
+            {"type": "userMessage", "id": "next-user", "content": [{"type": "text", "text": "Different task."}]},
+            {"type": "agentMessage", "id": "later", "text": "Final\nBRIDGE_DONE:" + job["id"]},
+        ])
+    with pytest.raises(ValueError):
+        store.collect(job["id"], data)
+    assert store.job(job["id"])["state"] == "dispatching"
+    assert not (store.job_dir(job["id"]) / "analysis.md").exists()
+
+
+def test_collect_complete_current_turn_ignores_older_history_pagination(workspace):
+    _, store = workspace
+    job = store.prepare("fixture", "analyze"); store.begin(job["id"], baseline())
+    data = read_result(job, store.prompt(job["id"]))
+    data["page"] = {"order": "newest_first", "hasMore": True, "nextCursor": "older-turns"}
+    assert store.collect(job["id"], data)["state"] == "analyzed"
+
+
+def test_collect_missing_request_on_page_does_not_accept_old_answer(workspace):
+    _, store = workspace
+    job = store.prepare("fixture", "analyze"); store.begin(job["id"], baseline())
+    data = read_result(job, store.prompt(job["id"]))
+    data["turns"][0]["items"] = data["turns"][0]["items"][1:]
+    data["page"] = {"hasMore": True, "nextCursor": "request-page"}
+    with pytest.raises(ValueError):
+        store.collect(job["id"], data)
+    assert store.job(job["id"])["state"] == "dispatching"
+
+
 def test_native_completed_turn_recovers_old_marker_only_cancellation(workspace):
     _, store = workspace
     job = store.prepare("fixture", "fix add"); store.begin(job["id"], baseline())

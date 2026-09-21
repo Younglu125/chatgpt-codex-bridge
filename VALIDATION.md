@@ -1,4 +1,22 @@
-# Validation — 0.2.9 integration candidate
+# Validation — 0.2.10 integration candidate
+
+2026-09-21 patch validation: 86 Python tests passed, including final-response selection,
+truncation/ambiguity rejection, 13 installer transition tests and two immutable-release checks.
+The installer tests fake external commands; they verify filesystem recovery and mode preservation,
+not real host cache recovery or remote ChatGPT connectivity. A read-only independent code review
+found no blocking issue. Four waiting-policy scenarios confirmed compact probes, delayed full reads,
+pending recovery and no duplicate sending; this is behavior review, not a measured token benchmark.
+Pinned upstream: 178 tests in 17 files and TypeScript build passed using Node 24.16.0 ARM64 and
+Apple Git 2.50.1. Initial runs failed due to an older PATH-selected Git and then a mismatched Node
+architecture; selecting the existing matching tools resolved both without changing upstream source.
+The source privacy scan, skill validator and plugin validator passed. No second-user installation,
+forced-process-termination recovery or new remote-account acceptance is implied by these checks.
+The candidate ZIP passed archive integrity and package privacy checks. A clean extraction into a
+directory with spaces passed standard-library-only Lite setup/doctor/project registration using
+empty isolated state, then locked Full dependency installation and build. The old 0.2.9 ZIP hash
+remained unchanged. These are same-machine package checks, not second-machine acceptance.
+
+## Historical validation
 
 0.2.9: 61 Python tests and 172 pinned-backend tests (17 files) passed on macOS ARM64.
 The release ZIP privacy gate passed; two rendered local routing screenshots were visually reviewed.

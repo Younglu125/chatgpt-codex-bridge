@@ -44,7 +44,7 @@ OAuth/配对、隧道及执行证据等能力，无需另外克隆上游仓库�
 **如果你希望直接采用“ChatGPT 规划与审查、Codex 执行”的实时 MCP 工作流，上游本身就可以满足这类需求。
 CCB 的价值是在复用这套后端的基础上，让你选择何时协作、如何提供证据，以及如何记录和收回分析结果。**
 
-以下对照基于 CCB 0.2.9 与锁定的上游提交
+以下对照基于 CCB 0.2.10 与锁定的上游提交
 [`9663b887`](https://github.com/XiaoDuoYa/codex-with-chatgpt/tree/9663b88753e35c76796c5bce000293e0bd22cd9e)，
 不是对上游未来版本的能力限制。
 
@@ -125,7 +125,7 @@ CCB 增加打包、证据交接和按需会话协调，保留上游源码和许�
 
 ## 安装
 
-**0.2.9 预览版。** macOS 已做本机验收；Linux/WSL2 是兼容目标，尚需独立验收。
+**0.2.10 预览版。** macOS 已做本机验收；Linux/WSL2 是兼容目标，尚需独立验收。
 CCB 的 POSIX 快照与锁实现不支持原生 Windows。
 
 ### 1. 获取程序
@@ -162,6 +162,11 @@ python3 scripts/install_plugin.py --mode full  # 需要 Full 时
 不满足时，使用发布 ZIP 内的 marketplace：
 `codex plugin marketplace add <解压目录>`，再从该 marketplace 安装 CCB。
 参见 [官方插件说明](https://developers.openai.com/plugins/build/plugins)。
+
+更新会先在临时目录构建，通过后才替换受管理的旧安装。自动模式保留 Full，只有明确传入
+`--mode lite` 才降为 Lite。成功后会显示保留的备份路径。注册失败时尝试恢复文件并重新注册
+旧版；恢复不完整会明确报出，请按提示核对路径，并新开任务验证加载。安装成功不代表
+ChatGPT 连通性已验证；进程被强制终止时仍可能需要手动恢复。
 
 ### 3. 开始使用与首次配置
 

@@ -48,7 +48,7 @@ No endorsement by upstream authors or OpenAI is implied.
 CCB builds on that backend to add choices about when to collaborate, how to supply evidence, and how
 to record and collect the resulting analysis.**
 
-This comparison covers CCB 0.2.9 and the pinned upstream revision
+This comparison covers CCB 0.2.10 and the pinned upstream revision
 [`9663b887`](https://github.com/XiaoDuoYa/codex-with-chatgpt/tree/9663b88753e35c76796c5bce000293e0bd22cd9e),
 not a claim about what future upstream versions can or cannot do.
 
@@ -134,7 +134,7 @@ prove Full access. Healthy project connections are reused.
 
 ## Install
 
-**0.2.9 preview.** macOS has been exercised. Linux/WSL2 remains a compatibility target.
+**0.2.10 preview.** macOS has been exercised. Linux/WSL2 remains a compatibility target.
 Native Windows is not supported by CCB's POSIX snapshot/locking layer.
 
 ### 1. Get the program
@@ -172,6 +172,12 @@ The convenience installer requires Codex CLI on PATH and the official plugin-cre
 Otherwise use the release ZIP's marketplace:
 `codex plugin marketplace add <extracted-directory>`, then install CCB from that marketplace.
 See [official packaging guidance](https://developers.openai.com/plugins/build/plugins).
+
+Updates build in staging before replacing the managed installation. Auto mode preserves Full;
+only explicit `--mode lite` requests a downgrade. A successful update prints its retained backup
+path. Registration failures attempt to restore files and re-register the previous package; if
+recovery is incomplete, follow the reported paths and verify loading in a new task. This does not
+verify ChatGPT connectivity, and abrupt termination may require manual recovery.
 
 ### 3. Start using CCB and complete first-time setup
 
