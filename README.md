@@ -80,7 +80,13 @@ Handoffs add latency. Use ChatGPT where its expected contribution outweighs that
 |---|---|---|
 | Lite / prompt | Question only | Python 3.12+, Codex, ordinary ChatGPT, working native or browser messaging |
 | Lite / snapshot | Selected filtered frozen files | Lite plus permission to share those files |
-| Full / live | File reads, search, Git diffs, recorded execution output | Lite plus Node.js 20+/npm, cloudflared, custom MCP/OAuth access |
+| Full / live | ChatGPT itself reads current files, searches, and inspects Git diffs and recorded execution output through MCP on demand | Lite plus Node.js 20+/npm, cloudflared, custom MCP/OAuth access |
+
+**With Lite snapshots, Codex selects files and sends frozen contents. With Full, ChatGPT decides what
+to inspect and uses an authorized local read-only MCP service to list directories, search and read
+current project files. Codex does not need to package the files in advance.**
+Full is limited to permitted contents within the authorized workspace, not arbitrary files on your computer.
+Codex still performs authorized edits and test runs; ChatGPT can inspect recorded execution results through MCP.
 
 Optional frozen-snapshot MCP requires the Python MCP extra and separate HTTPS/OAuth setup.
 Full uses the pinned [codex-with-chatgpt](https://github.com/XiaoDuoYa/codex-with-chatgpt) backend.
@@ -173,7 +179,9 @@ An explicit GPT request overrides the normal cost/latency choice.
 State lives outside the plugin at `~/.local/share/chatgpt-codex-bridge` or `BRIDGE_STATE_DIR`.
 Never share that directory, transcripts, credentials, pairing codes or personal chat URLs.
 
-Lite sends selected contents to ChatGPT. Full sends contents actually requested through MCP.
+Lite snapshots send file contents selected by Codex to ChatGPT. With Full, ChatGPT initiates MCP read
+requests and the local service returns permitted contents to ChatGPT; Codex does not package and upload
+those files in advance.
 **Read-only does not mean data stays on your Mac.** Filtering is not a secrecy guarantee.
 Review scope before allowing a handoff.
 

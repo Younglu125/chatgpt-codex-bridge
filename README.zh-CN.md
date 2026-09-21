@@ -76,7 +76,12 @@ OAuth/配对、隧道及执行证据等能力，无需另外克隆上游仓库�
 |---|---|---|
 | Lite / prompt | 问题文字 | Python 3.12+、Codex、普通 ChatGPT、原生或浏览器收发工具 |
 | Lite / snapshot | 少量经过筛选的冻结文件 | Lite 条件及分享文件的授权 |
-| Full / live | 按需文件读取、搜索、Git diff、已记录的执行结果 | 另需 Node.js 20+/npm、cloudflared、自定义 MCP/OAuth 授权 |
+| Full / live | ChatGPT 自己通过 MCP 按需读取当前文件、搜索、查看 Git diff 和已记录的执行结果 | 另需 Node.js 20+/npm、cloudflared、自定义 MCP/OAuth 授权 |
+
+**Lite 快照由 Codex 选取文件并发送冻结内容；Full 则由 ChatGPT 自己决定需要查看什么，
+通过已授权的本地只读 MCP 服务列目录、搜索和读取当前项目文件，无需 Codex 预先打包文件。**
+Full 只能访问授权工作区中符合访问规则的内容，不是整台电脑的任意文件。
+修改文件和运行测试仍由 Codex 根据授权执行；ChatGPT 可通过 MCP 查看已记录的执行结果。
 
 还有可选冻结快照 MCP，需 Python MCP 依赖和独立 HTTPS/OAuth 配置。
 Full 使用锁定的 [codex-with-chatgpt](https://github.com/XiaoDuoYa/codex-with-chatgpt) 后端；
@@ -164,7 +169,8 @@ Full 只读；修改由 Codex 根据授权执行。只要求分析就停在分�
 运行状态位于 `~/.local/share/chatgpt-codex-bridge` 或 `BRIDGE_STATE_DIR`，
 不随插件发布。不要分享该目录、日志、配对码、凭据或个人聊天链接。
 
-Lite 会把选中文件发给 ChatGPT；Full 也会把实际读取的内容发给 ChatGPT。
+Lite 快照会将 Codex 选取的文件内容发送给 ChatGPT；Full 则在 ChatGPT 发起 MCP 读取请求时，
+由本地服务将允许读取的内容返回给 ChatGPT，而不是由 Codex 预先打包上传。
 **只读不代表数据不离开本机。** 过滤脱敏不是绝对保证，应检查分享范围。
 
 ```bash
