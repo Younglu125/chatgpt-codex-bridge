@@ -42,6 +42,42 @@ The upstream source, MIT license and attribution are retained.
 Other dependencies retain their own manifests and licenses. See [third-party notices](THIRD_PARTY_NOTICES.md).
 No endorsement by upstream authors or OpenAI is implied.
 
+## CCB or codex-with-chatgpt: which should you choose?
+
+**Upstream already provides a live MCP workflow where ChatGPT plans and reviews while Codex executes.
+CCB builds on that backend to add choices about when to collaborate, how to supply evidence, and how
+to record and collect the resulting analysis.**
+
+This comparison covers CCB 0.2.9 and the pinned upstream revision
+[`9663b887`](https://github.com/XiaoDuoYa/codex-with-chatgpt/tree/9663b88753e35c76796c5bce000293e0bd22cd9e),
+not a claim about what future upstream versions can or cannot do.
+
+| Concern | Using upstream directly | What CCB adds and why it may help |
+|---|---|---|
+| Collaboration cadence | Centers on a ChatGPT plan / Codex execution / ChatGPT review loop | A per-Codex-conversation switch; routine edits and tests remain local, with consultation at substantial analysis, decision and review points, plus one-step local overrides and explicit exit |
+| Getting started | Live read-only MCP is the core file-access route and requires connection setup and authorization | Lite questions and bounded frozen-file snapshots can work without first configuring MCP, Node or a tunnel; Full remains available for repository exploration |
+| Messaging | The Skill primarily interacts with ChatGPT through the browser | Prefers native chat tools when the host actually exposes them, with a browser route as well; messaging and file access are separate choices, not a promise of native tools in every client |
+| Handoff records | Already has sessions, checkpoints, recovery and independent review | Adds per-project jobs, original replies, snapshot fingerprints and linked review records, distinguishing delivered analysis from implemented code for inspection and traceability |
+| Packaging and versions | Install and update through the upstream Skill, following upstream maintenance directly | Codex plugin packaging, Lite / Full installation choices, package manifests and privacy scanning; an explicitly upgraded pinned backend offers version control but adds upstream maintenance responsibility |
+
+For example, use a question-only request to discuss an idea, a Lite snapshot for a few known files,
+or Full when ChatGPT needs to search the project itself. A healthy existing Full connection takes
+precedence for file-dependent work, avoiding unnecessary setup changes. The Skill and local helpers
+coordinate these choices; they are not a global scheduler that bypasses host limitations.
+
+**Choose CCB when** you want Codex-led everyday work with selective ChatGPT participation, a
+low-dependency Lite entry point, or additional handoff records and plugin distribution tooling.
+
+**Choose upstream directly when** its live MCP planning/execution/review workflow is all you need,
+you prefer fewer wrapping and state layers, or you want to follow upstream features and fixes directly.
+
+CCB is not a stronger model or a replacement MCP security backend. Full's read-only access, OAuth,
+tunnels and execution evidence come from upstream; project sessions, recovery and independent review
+are not exclusive to CCB either. CCB additionally requires Python 3.12+ and remains a preview.
+No greater speed, stability or quota savings are claimed. See the implementations for
+[conversation control](scripts/session.py), [routing](scripts/route.py), [handoff records](bridge.py)
+and [message transport](skills/chatgpt-codex-bridge/references/transport.md).
+
 ## A small switch, a natural workflow
 
 | Your request | What happens |
